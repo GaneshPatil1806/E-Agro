@@ -54,7 +54,8 @@ export const product = {
         "qrCode": "https://cdn.dummyjson.com/public/qr-code.png"
     },
     "images": [
-        "https://cdn.dummyjson.com/products/images/beauty/Eyeshadow%20Palette%20with%20Mirror/1.png"
+        "https://cdn.dummyjson.com/products/images/beauty/Eyeshadow%20Palette%20with%20Mirror/1.png",
+        "https://cdn.dummyjson.com/products/images/beauty/Powder%20Canister/1.png"
     ],
     "thumbnail": "https://cdn.dummyjson.com/products/images/beauty/Eyeshadow%20Palette%20with%20Mirror/thumbnail.png"
 }
