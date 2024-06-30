@@ -4,6 +4,7 @@ import "./globals.css";
 import NavBar from "./components/nav/NavBar";
 import Footer from "./components/footer/Footer";
 import CartProvider from "@/providers/CartProvider";
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,6 +23,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
+
+        <Toaster toastOptions={{style:{
+          background:'rgb(51 65 85)',
+          color:'#fff'
+        }}}/>
+
         <CartProvider>
           <div className="flex flex-col min-h-screen">
               <NavBar />

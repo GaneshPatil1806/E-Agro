@@ -7,7 +7,7 @@ import Button from "@/app/components/products/Button";
 import SetProductImage from "@/app/components/products/SetProductImage";
 import { useCart } from "@/app/hooks/useCart";
 import { MdCheckCircle } from "react-icons/md";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 interface ProductDetailsProps {
     product: any;
@@ -135,8 +135,10 @@ const ProductDetails: React.FC<ProductDetailsProps> = ({ product }) => {
                         <span>Product added to cart</span>
                     </p>
 
-                    <div>
-                        <Button label="View Cart" outline onClick={()=>{}}></Button>
+                    <div className="max-w-[300px]">
+                        <Button label="View Cart" outline onClick={()=>{
+                            router.push('/cart')
+                        }}></Button>
                     </div>
                 </> : <>
                     <SetQuanity cartProduct={cartProduct}
