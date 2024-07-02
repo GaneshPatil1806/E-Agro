@@ -7,6 +7,10 @@ type CartContextType = {
     cartTotalQty: number;
     cartProducts: CartProductType[] | null;
     handleAddProductToCart: (product: CartProductType)=> void
+    handleRemoveProductFromCart: (product: CartProductType)=> void
+    handleCartQtyDecrease:(product: CartProductType)=> void
+    handleCartQtyIncrease:(product: CartProductType)=> void
+    handleClearCart: ()=> void
 }
 
 interface Props {
@@ -22,7 +26,46 @@ export const CartContextProvider =(props: Props)=> {
         const cartItems: any = localStorage.getItem('eShopCartItems');
         const cProducts: CartProductType[] | null = JSON.parse(cartItems);
         setcartProducts(cProducts);
+    },[]);
+
+    const handleClearCart = useCallback(()=>{
+        setcartProducts(null);
+        setCartTotalQty(0);
+        localStorage.setItem('eShopCartItems',JSON.stringify(null));
     },[])
+
+    const handleCartQtyIncrease = useCallback((product: CartProductType)=>{
+        let updatedCart;
+        if(cartProducts){
+            updatedCart=[...cartProducts];
+
+            const exist = cartProducts.findIndex((item)=>item.id === product.id);
+            if(exist>-1){
+                updatedCart[exist].quantity++;
+            }
+
+            setcartProducts(updatedCart);
+            localStorage.setItem('eShopCartItems',JSON.stringify(updatedCart));
+        }
+    },[cartProducts,setcartProducts])
+
+    const handleCartQtyDecrease = useCallback((product: CartProductType)=>{
+        let updatedCart;
+        if(cartProducts){
+            updatedCart=[...cartProducts];
+
+            const exist = cartProducts.findIndex((item)=>item.id === product.id);
+            if(exist>-1){
+                if(updatedCart[exist].quantity===1){
+                    return toast.error('Minimum limit reached!'); 
+                }
+                updatedCart[exist].quantity--;
+            }
+
+            setcartProducts(updatedCart);
+            localStorage.setItem('eShopCartItems',JSON.stringify(updatedCart));
+        }
+    },[cartProducts,setcartProducts])
 
     const handleAddProductToCart = useCallback((product: CartProductType)=>{
         setcartProducts((prev)=>{
@@ -39,10 +82,26 @@ export const CartContextProvider =(props: Props)=> {
         })
     },[]);
 
+    const handleRemoveProductFromCart = useCallback((product: CartProductType)=>{
+        if(cartProducts){
+            const filteredProducts = cartProducts.filter((item)=>{
+                return item.id!==product.id;
+            })
+
+            setcartProducts(filteredProducts);
+            localStorage.setItem('eShopCartItems',JSON.stringify(filteredProducts));
+            toast.success('Product removed');
+        }   
+    },[cartProducts])
+
     const value = {
         cartTotalQty,
         cartProducts,
-        handleAddProductToCart
+        handleAddProductToCart,
+        handleRemoveProductFromCart,
+        handleCartQtyDecrease,
+        handleCartQtyIncrease,
+        handleClearCart
     }
 
     return <CartContext.Provider value={value} {...props}></CartContext.Provider>
