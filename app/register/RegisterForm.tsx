@@ -1,4 +1,5 @@
 'use client';
+
 import { useState } from "react";
 import Input from "../components/inputs/Input";
 import Heading from "../components/products/Heading";
@@ -6,58 +7,93 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import Button from "../components/products/Button";
 import Link from "next/link";
 import { AiOutlineGoogle } from "react-icons/ai";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const RegisterForm = () => {
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
 
-    const [isLoading, setIsLoading] = useState(false);
-    const { register, handleSubmit, formState: { errors } } = useForm<FieldValues>({
-        defaultValues: {
-            name: "",
-            email: "",
-            password: ""
-        }
-    });
-
-    const onSubmit: SubmitHandler<FieldValues> = (data) => {
-        setIsLoading(true);
-        console.log(data);
+  const { register, handleSubmit, formState: { errors } } = useForm<FieldValues>({
+    defaultValues: {
+      name: "",
+      email: "",
+      password: ""
     }
+  });
 
-    return (
-        <>
-            <Heading title="Sign up for E-Agro" />
-            <Button outline label="Sign up with Google" 
-            icon={AiOutlineGoogle}
-            onClick={() => { }}>
-            </Button>
+  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+    setIsLoading(true);
+    try {
+      await axios.post('/api/register', data);
+      toast.success('Account created!');
 
-            <hr className="bg-slate-300 w-full h-px"></hr>
-            <Input id="name"
-                label="Name"
-                disabled={isLoading}
-                register={register}
-                errors={errors}
-                required
-            />
-            <Input id="email"
-                label="Email"
-                disabled={isLoading}
-                register={register}
-                errors={errors}
-                required
-            />
-            <Input id="password"
-                label="Password"
-                disabled={isLoading}
-                register={register}
-                errors={errors}
-                required
-                type="password"
-            />
-            <Button label={isLoading ? "Loading" : "SignUp"} onClick={handleSubmit(onSubmit)}></Button>
-            <p className="text-sm">Already have an accont? <Link href='/login' className="underline">Log in</Link></p>
-        </>
-    );
+      const callback = await signIn('credentials', {
+        email: data.email,
+        password: data.password,
+        redirect: false
+      });
+
+      if (callback?.ok) {
+        router.push('/cart');
+        router.refresh();
+        toast.success('Logged In');
+      } else if (callback?.error) {
+        toast.error(callback.error);
+      }
+    } catch (error) {
+      toast.error('Failed to create account');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <>
+      <Heading title="Sign up for E-Agro" />
+      <Button 
+        outline 
+        label="Sign up with Google" 
+        icon={AiOutlineGoogle} 
+        onClick={() => {}} 
+      />
+      <hr className="bg-slate-300 w-full h-px" />
+      <Input 
+        id="name" 
+        label="Name" 
+        disabled={isLoading} 
+        register={register} 
+        errors={errors} 
+        required 
+      />
+      <Input 
+        id="email" 
+        label="Email" 
+        disabled={isLoading} 
+        register={register} 
+        errors={errors} 
+        required 
+      />
+      <Input 
+        id="password" 
+        label="Password" 
+        disabled={isLoading} 
+        register={register} 
+        errors={errors} 
+        required 
+        type="password" 
+      />
+      <Button 
+        label={isLoading ? "Loading..." : "Sign Up"} 
+        onClick={handleSubmit(onSubmit)} 
+      />
+      <p className="text-sm">
+        Already have an account? <Link href='/login' className="underline">Log in</Link>
+      </p>
+    </>
+  );
 }
 
 export default RegisterForm;
